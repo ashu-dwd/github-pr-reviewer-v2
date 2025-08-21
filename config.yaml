@@ -1,0 +1,20 @@
+# Configuration for the AI-Powered Pull Request Review Tool
+
+# AI Service Configuration
+ai_service:
+  # The model to use for generating reviews (e.g., "gemini-pro")
+  model: "gemini-2.5-pro"
+  # The maximum number of tokens to use for the review.
+  max_tokens: 2048
+
+# GitHub Service Configuration
+github_service:
+  # Files to include in the review (glob patterns)
+  include_files:
+    - "**/*.py"
+    - "**/*.js"
+  # Files to exclude from the review (glob patterns)
+  exclude_files:
+    - "**/tests/**"
+    - "**/node_modules/**"
+    - "**/dist/**"
