@@ -1,6 +1,6 @@
 # AI-Powered Pull Request Review Tool
 
-This tool is an AI-powered assistant for reviewing pull requests on GitHub. It analyzes PRs, checks for code quality issues, and provides actionable feedback to developers.
+This tool is an AI-powered assistant for reviewing pull requests on GitHub. It analyzes PRs, checks for code quality issues, and provides actionable feedback to the developers.
 
 ## Architecture
 
