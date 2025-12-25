@@ -1,8 +1,7 @@
 # Virtual environment
 venv/
 
-# Configuration file
-config.yaml
+
 
 # GitHub token
 GITHUB_TOKEN

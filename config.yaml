@@ -2,19 +2,103 @@
 
 # AI Service Configuration
 ai_service:
-  # The model to use for generating reviews (e.g., "gemini-pro")
+  # The model to use for generating reviews
   model: "gemini-2.5-flash"
-  # The maximum number of tokens to use for the review.
-  max_tokens: 4096
+  # The maximum number of tokens to use for the review
+  max_tokens: 2048
 
 # GitHub Service Configuration
 github_service:
   # Files to include in the review (glob patterns)
+  # Supports: Python, JavaScript, TypeScript, Java, Go, Rust, C/C++, C#, Ruby, PHP, Kotlin, Swift, Scala
   include_files:
-    - "**/*.py"
+    # Web Development
     - "**/*.js"
+    - "**/*.jsx"
+    - "**/*.ts"
+    - "**/*.tsx"
+    - "**/*.vue"
+    - "**/*.svelte"
+    # Backend/Systems
+    - "**/*.py"
+    - "**/*.java"
+    - "**/*.go"
+    - "**/*.rs"
+    - "**/*.c"
+    - "**/*.cpp"
+    - "**/*.h"
+    - "**/*.hpp"
+    - "**/*.cs"
+    # Mobile
+    - "**/*.kt"
+    - "**/*.swift"
+    # Scripting
+    - "**/*.rb"
+    - "**/*.php"
+    - "**/*.scala"
+    - "**/*.sh"
+    - "**/*.bash"
+    # Config/Data (review for security)
+    - "**/*.yaml"
+    - "**/*.yml"
+    - "**/*.json"
+    - "**/*.toml"
+    # SQL
+    - "**/*.sql"
+    # Dockerfiles
+    - "**/Dockerfile"
+    - "**/*.dockerfile"
+
   # Files to exclude from the review (glob patterns)
   exclude_files:
     - "**/tests/**"
+    - "**/test/**"
+    - "**/__tests__/**"
     - "**/node_modules/**"
     - "**/dist/**"
+    - "**/build/**"
+    - "**/target/**"
+    - "**/vendor/**"
+    - "**/.git/**"
+    - "**/package-lock.json"
+    - "**/yarn.lock"
+    - "**/pnpm-lock.yaml"
+    - "**/*.min.js"
+    - "**/*.min.css"
+    - "**/*.generated.*"
+
+# Language-specific review hints (used to provide context to AI)
+language_hints:
+  python:
+    extensions: [".py"]
+    focus: ["PEP8 style", "type hints", "docstrings", "pythonic patterns"]
+  javascript:
+    extensions: [".js", ".jsx"]
+    focus: ["ES6+ syntax", "async/await", "error handling", "XSS prevention"]
+  typescript:
+    extensions: [".ts", ".tsx"]
+    focus: ["type safety", "interface usage", "generics", "strict mode"]
+  java:
+    extensions: [".java"]
+    focus:
+      [
+        "null safety",
+        "exception handling",
+        "design patterns",
+        "memory management",
+      ]
+  go:
+    extensions: [".go"]
+    focus: ["error handling", "goroutines", "defer usage", "idiomatic Go"]
+  rust:
+    extensions: [".rs"]
+    focus: ["ownership", "lifetimes", "Result/Option handling", "unsafe blocks"]
+  cpp:
+    extensions: [".cpp", ".hpp", ".c", ".h"]
+    focus: ["memory management", "RAII", "smart pointers", "undefined behavior"]
+  sql:
+    extensions: [".sql"]
+    focus: ["SQL injection", "performance", "indexing", "transactions"]
+  docker:
+    extensions: [".dockerfile", "Dockerfile"]
+    focus: ["security", "layer optimization", "non-root user", "sensitive data"]

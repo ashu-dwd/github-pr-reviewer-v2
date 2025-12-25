@@ -6,10 +6,23 @@ An AI-powered assistant for reviewing pull requests on GitHub. It analyzes PRs, 
 
 - 🔄 **Automatic Reviews** - Reviews PRs automatically when opened or updated
 - 💬 **Re-review Command** - Comment `/review` on any PR to trigger a fresh review
-- 🎯 **Structured Feedback** - Clear severity levels (🔴 Critical, 🟠 Warning, 🟡 Suggestion, 🟢 Praise)
+- � **Multi-Language Support** - Smart reviews for 20+ programming languages
+- �🎯 **Structured Feedback** - Clear severity levels (🔴 Critical, 🟠 Warning, 🟡 Suggestion, 🟢 Praise)
 - 🔒 **Security Scanning** - Detects potential security issues
 - 📝 **Actionable Checklists** - Provides concrete improvement items
 - 🛡️ **Secret Redaction** - Automatically redacts potential secrets from diffs
+
+### Supported Languages
+
+| Category        | Languages                                               |
+| --------------- | ------------------------------------------------------- |
+| **Web**         | JavaScript, TypeScript, React (JSX/TSX), Vue.js, Svelte |
+| **Backend**     | Python, Java, Go, Rust, C#, PHP, Ruby, Scala            |
+| **Systems**     | C, C++                                                  |
+| **Mobile**      | Kotlin, Swift                                           |
+| **Scripts**     | Shell, Bash                                             |
+| **Data/Config** | SQL, YAML, JSON, TOML                                   |
+| **DevOps**      | Dockerfile                                              |
 
 ## 🚀 Quick Start
 
