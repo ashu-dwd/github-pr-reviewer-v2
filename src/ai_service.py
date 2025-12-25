@@ -1,10 +1,11 @@
 import os
-import google.generativeai as genai
 import yaml
+from google import genai
+
 
 class AIService:
     """
-    A service to interact with a Large Language Model (LLM).
+    A service to interact with a Large Language Model (LLM) using the new Google GenAI SDK.
     """
     def __init__(self, config_path='config.yaml'):
         """
@@ -20,8 +21,9 @@ class AIService:
         if not self.api_key:
             raise ValueError("Gemini API key not found. Set the GEMINI_API_KEY environment variable.")
         
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel(self.config['model'])
+        # using the new centralized Client object from google-genai SDK
+        self.client = genai.Client(api_key=self.api_key)
+        self.model_name = self.config['model']
 
     def generate_review(self, analyzed_diff):
         """
@@ -39,7 +41,11 @@ class AIService:
         for file in analyzed_diff["files"]:
             for chunk in file["chunks"]:
                 prompt = self._build_prompt(analyzed_diff, file['file_name'], chunk)
-                response = self.model.generate_content(prompt)
+                # using the new client.models.generate_content() API
+                response = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=prompt
+                )
                 reviews.append(response.text)
         
         return "\n\n".join(reviews)
