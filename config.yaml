@@ -3,9 +3,9 @@
 # AI Service Configuration
 ai_service:
   # The model to use for generating reviews (e.g., "gemini-pro")
-  model: "gemini-2.5-pro"
+  model: "gemini-2.5-flash"
   # The maximum number of tokens to use for the review.
-  max_tokens: 2048
+  max_tokens: 4096
 
 # GitHub Service Configuration
 github_service:

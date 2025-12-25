@@ -4,6 +4,11 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+# granting write permission so the bot can post comments on PRs
+permissions:
+  pull-requests: write
+  contents: read
+
 jobs:
   review:
     runs-on: ubuntu-latest
@@ -23,4 +28,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python src/main.py ${{ github.event.pull_request.html_url }}
+        working-directory: ${{ github.workspace }}
+        run: python src/main.py "${{ github.event.pull_request.html_url }}"
