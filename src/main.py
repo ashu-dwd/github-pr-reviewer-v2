@@ -3,6 +3,10 @@ import argparse
 from github_service import GithubService
 from review_generator import ReviewGenerator
 
+# resolving config path relative to this script's location
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_PATH = os.path.join(SCRIPT_DIR, '..', 'config.yaml')
+
 def main():
     """
     Main function to run the PR review tool.
@@ -15,8 +19,8 @@ def main():
     if not args.token:
         raise ValueError("GitHub token not provided. Set the GITHUB_TOKEN environment variable or use the --token flag.")
 
-    github_service = GithubService(args.token, config_path='config.yaml')
-    review_generator = ReviewGenerator(github_service)
+    github_service = GithubService(args.token, config_path=CONFIG_PATH)
+    review_generator = ReviewGenerator(github_service, config_path=CONFIG_PATH)
 
     review_generator.run(args.pr_url)
 

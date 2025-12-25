@@ -6,16 +6,17 @@ class ReviewGenerator:
     """
     Orchestrates the pull request review process.
     """
-    def __init__(self, github_service: GithubService):
+    def __init__(self, github_service: GithubService, config_path: str = 'config.yaml'):
         """
         Initializes the ReviewGenerator.
 
         Args:
             github_service (GithubService): An instance of the GithubService.
+            config_path (str): Path to the configuration file.
         """
         self.github_service = github_service
         self.diff_analyzer = DiffAnalyzer()
-        self.ai_service = AIService(config_path='config.yaml')
+        self.ai_service = AIService(config_path=config_path)
 
     def run(self, pr_url):
         """
