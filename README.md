@@ -26,13 +26,124 @@ An AI-powered assistant for reviewing pull requests on GitHub. It analyzes PRs, 
 
 ## 🚀 Quick Start
 
-### 1. Add the GitHub Workflow
+Choose one of the two options below:
 
-Copy `.github/workflows/main.yml` to your repository.
+---
 
-### 2. Add Secrets
+### Option 1: Copy Files (Simple Setup)
 
-Go to your repository **Settings → Secrets → Actions** and add:
+Best for single repositories or when you want full control.
+
+**Step 1:** Copy these files to your repository:
+
+- `.github/workflows/main.yml`
+- `src/` folder
+- `config.yaml`
+- `requirements.txt`
+
+**Step 2:** Add the `GEMINI_API_KEY` secret (see below).
+
+---
+
+### Option 2: Reusable Workflow (Recommended for Multiple Repos)
+
+Best when you want to use this tool across many repositories without duplicating code.
+
+**Step 1:** Create `.github/workflows/pr-review.yml` in your target repository:
+
+```yaml
+name: AI PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request &&
+       contains(github.event.comment.body, '/review'))
+
+    steps:
+      - name: Checkout reviewer tool
+        uses: actions/checkout@v4
+        with:
+          repository: ashu-dwd/github-pr-reviewer-v2
+          path: reviewer
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r reviewer/requirements.txt
+
+      - name: Add reaction to comment
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
+
+      - name: Get PR URL
+        id: get_pr_url
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let prUrl;
+            if (context.eventName === 'pull_request') {
+              prUrl = context.payload.pull_request.html_url;
+            } else {
+              const pr = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.issue.number
+              });
+              prUrl = pr.data.html_url;
+            }
+            core.setOutput('pr_url', prUrl);
+
+      - name: Run AI Review
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python reviewer/src/main.py "${{ steps.get_pr_url.outputs.pr_url }}"
+
+      - name: Add success reaction
+        if: github.event_name == 'issue_comment' && success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket'
+            });
+```
+
+**Step 2:** Add the `GEMINI_API_KEY` secret (see below).
+
+---
+
+### Add Secrets (Required for Both Options)
+
+Go to your repository **Settings → Secrets and variables → Actions** and add:
 
 | Secret           | Description                                                                            |
 | ---------------- | -------------------------------------------------------------------------------------- |
@@ -40,7 +151,7 @@ Go to your repository **Settings → Secrets → Actions** and add:
 
 > **Note:** `GITHUB_TOKEN` is automatically provided by GitHub Actions.
 
-### 3. That's It! 🎉
+### That's It! 🎉
 
 The bot will now automatically review all new PRs.
 
