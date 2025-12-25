@@ -1,68 +1,174 @@
-# AI-Powered Pull Request Review Tool
+# 🤖 AI-Powered Pull Request Review Tool
 
-This tool is an AI-powered assistant for reviewing pull requests on GitHub. It analyzes PRs, checks for code quality issues, and provides actionable feedback to the developers.
+An AI-powered assistant for reviewing pull requests on GitHub. It analyzes PRs, checks for code quality issues, security vulnerabilities, and provides actionable feedback.
 
-## Architecture
+## ✨ Features
 
-The application will follow a modular architecture, separating concerns into distinct components. This design ensures maintainability, testability, and extensibility.
+- 🔄 **Automatic Reviews** - Reviews PRs automatically when opened or updated
+- 💬 **Re-review Command** - Comment `/review` on any PR to trigger a fresh review
+- 🎯 **Structured Feedback** - Clear severity levels (🔴 Critical, 🟠 Warning, 🟡 Suggestion, 🟢 Praise)
+- 🔒 **Security Scanning** - Detects potential security issues
+- 📝 **Actionable Checklists** - Provides concrete improvement items
+- 🛡️ **Secret Redaction** - Automatically redacts potential secrets from diffs
+
+## 🚀 Quick Start
+
+### 1. Add the GitHub Workflow
+
+Copy `.github/workflows/main.yml` to your repository.
+
+### 2. Add Secrets
+
+Go to your repository **Settings → Secrets → Actions** and add:
+
+| Secret           | Description                                                                            |
+| ---------------- | -------------------------------------------------------------------------------------- |
+| `GEMINI_API_KEY` | Your Google AI Studio API key ([Get one here](https://aistudio.google.com/app/apikey)) |
+
+> **Note:** `GITHUB_TOKEN` is automatically provided by GitHub Actions.
+
+### 3. That's It! 🎉
+
+The bot will now automatically review all new PRs.
+
+## 💡 Usage
+
+### Automatic Review
+
+The bot automatically reviews PRs when:
+
+- A new PR is **opened**
+- New commits are **pushed** to an existing PR
+
+### Manual Re-review
+
+Comment on any PR to trigger a fresh review:
+
+```
+/review
+```
+
+The bot will react with 👀 when it starts and 🚀 when complete.
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      main.py (CLI)                          │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   review_generator.py                        │
+│              (Orchestrates the review process)               │
+└─────────────────────────────────────────────────────────────┘
+         │                    │                    │
+         ▼                    ▼                    ▼
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│ github_service  │  │  diff_analyzer  │  │   ai_service    │
+│ (GitHub API)    │  │ (Parse diffs)   │  │ (Gemini AI)     │
+└─────────────────┘  └─────────────────┘  └─────────────────┘
+```
 
 ### Core Modules
 
-1.  **GitHub Service (`src/github_service.py`)**: This module will be responsible for all interactions with the GitHub API. It will handle fetching PR details, diffs, and posting comments. It will use either the GitHub REST or GraphQL API.
+| Module                | Description                                                |
+| --------------------- | ---------------------------------------------------------- |
+| `github_service.py`   | Handles GitHub API interactions (fetch PRs, post comments) |
+| `diff_analyzer.py`    | Parses diffs, chunks large files, redacts secrets          |
+| `ai_service.py`       | Generates AI reviews using Google Gemini                   |
+| `review_generator.py` | Orchestrates the entire review workflow                    |
+| `main.py`             | CLI entry point                                            |
+| `config.yaml`         | Configuration settings                                     |
 
-2.  **Diff Analyzer (`src/diff_analyzer.py`)**: This module will contain the logic for parsing and analyzing the diffs from a pull request. It will identify added, modified, and deleted lines, and prepare the data for the AI service.
+## ⚙️ Configuration
 
-3.  **AI Service (`src/ai_service.py`)**: This module will be responsible for interacting with a Large Language Model (LLM). It will take the processed diff from the `Diff Analyzer` and generate human-like review comments. It will also handle prompt engineering to get the best results from the LLM.
+Edit `config.yaml` to customize behavior:
 
-4.  **Review Generator (`src/review_generator.py`)**: This module will orchestrate the review process. It will use the `GitHub Service` to get PR data, the `Diff Analyzer` to process the diff, and the `AI Service` to generate comments. Finally, it will format the review and use the `GitHub Service` to post it.
+```yaml
+ai_service:
+  model: "gemini-2.5-flash" # AI model to use
+  max_tokens: 2048 # Max response length
 
-5.  **Main/CLI (`src/main.py`)**: This will be the main entry point for the application. It will handle command-line arguments (e.g., PR URL, GitHub token) and trigger the review process. It will also serve as the entry point for the GitHub Action.
+github_service:
+  include_files: # Files to review (glob patterns)
+    - "**/*.py"
+    - "**/*.js"
+    - "**/*.ts"
+  exclude_files: # Files to skip
+    - "**/tests/**"
+    - "**/node_modules/**"
+    - "**/dist/**"
+```
 
-6.  **Configuration (`config.yaml`)**: A configuration file will be used to store settings like the LLM to use, token limits, and file inclusion/exclusion patterns.
-
-### Data Flow
-
-1.  The `main.py` script is invoked with a PR URL.
-2.  The `Review Generator` fetches the PR data and diff from the `GitHub Service`.
-3.  The diff is passed to the `Diff Analyzer` for processing.
-4.  The processed diff is sent to the `AI Service` to generate review comments.
-5.  The `Review Generator` formats the comments into a Markdown report.
-6.  The report is posted as a comment on the PR using the `GitHub Service`.
-
-This architecture provides a solid foundation for building a robust and scalable PR review tool.
-
-## Usage
+## 🖥️ Local Development
 
 ### Prerequisites
 
 - Python 3.8+
-- A GitHub API token with `repo` scope.
-- An API key for the selected LLM (e.g., Gemini).
+- GitHub Personal Access Token with `repo` scope
+- Gemini API Key
 
 ### Installation
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/your-username/ai-pr-reviewer.git
-    cd ai-pr-reviewer
-    ```
-2.  Install the dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
+```bash
+# clone the repo
+git clone https://github.com/ashu-dwd/github-pr-reviewer-v2.git
+cd github-pr-reviewer-v2
 
-### Running the Tool
+# create virtual environment
+python3 -m venv venv
+source venv/bin/activate
 
-1.  Set the required environment variables:
-    ```bash
-    export GITHUB_TOKEN="your_github_token"
-    export GEMINI_API_KEY="your_gemini_api_key"
-    ```
-2.  Run the tool from the command line:
-    ```bash
-    python src/main.py <pull_request_url>
-    ```
+# install dependencies
+pip install -r requirements.txt
+```
 
-### GitHub Action
+### Running Locally
 
-This tool can also be run as a GitHub Action. To do so, add the `.github/workflows/main.yml` file to your repository. You will also need to add `GEMINI_API_KEY` as a secret to your repository.
+```bash
+# set environment variables
+export GITHUB_TOKEN="your_github_token"
+export GEMINI_API_KEY="your_gemini_api_key"
+
+# review a specific PR
+python src/main.py "https://github.com/owner/repo/pull/123"
+```
+
+## 📋 Review Output Example
+
+```markdown
+## 🤖 AI Code Review
+
+> **PR:** Add user authentication
+> **Files Reviewed:** 3
+
+---
+
+### 📄 `auth.py`
+
+**Summary:** Adds login function with password validation.
+
+**Findings:**
+
+- 🔴 **Critical:** SQL Injection vulnerability
+
+  - **Line:** 45
+  - **Problem:** User input directly in SQL query
+  - **Suggestion:** Use parameterized queries
+
+- 🟢 **Praise:** Good use of context managers
+
+**Checklist:**
+
+- [ ] Fix SQL injection
+- [ ] Add input validation
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please open an issue or submit a PR.
+
+## 📄 License
+
+MIT License - feel free to use this in your own projects!
