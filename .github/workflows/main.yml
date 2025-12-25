@@ -4,6 +4,11 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+# granting write permission so the bot can post comments on PRs
+permissions:
+  pull-requests: write
+  contents: read
+
 jobs:
   review:
     runs-on: ubuntu-latest
